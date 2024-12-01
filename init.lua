@@ -159,6 +159,17 @@ require("lazy").setup({
 		dependencies = { "nvim-tree/nvim-web-devicons" },
 	},
 	{
+		"windwp/nvim-autopairs",
+		config = function()
+			require("nvim-autopairs").setup({})
+			-- Integration with nvim-cmp
+			local cmp_autopairs = require("nvim-autopairs.completion.cmp")
+			local cmp = require("cmp")
+			cmp.event:on("confirm_done", cmp_autopairs.on_confirm_done())
+		end,
+	},
+
+	{
 		"neoclide/coc.nvim",
 
 		branch = "release",
@@ -646,6 +657,18 @@ require("lazy").setup({
 						},
 					},
 				},
+				marksman = {
+					cmd = { vim.fn.exepath("marksman") }, -- Use full path
+					filetypes = { "markdown", "markdown.mdx" },
+					root_dir = require("lspconfig.util").root_pattern(".git", "marksman.toml", "."),
+					single_file_support = true,
+					settings = {
+						-- Optional additional settings
+						marksman = {
+							-- You can add custom configuration here
+						},
+					},
+				},
 			}
 
 			-- Ensure the servers and tools above are installed
@@ -665,6 +688,7 @@ require("lazy").setup({
 				"java-test",
 				"lombok-lombok",
 				"lemminx", -- XML Language Server (helpful for Spring)
+				"marksman",
 			})
 
 			-- Update Mason tool installer
@@ -714,6 +738,7 @@ require("lazy").setup({
 			vim.list_extend(ensure_installed, {
 				"stylua", -- Used to format Lua code
 			})
+
 			require("mason-tool-installer").setup({ ensure_installed = ensure_installed })
 
 			require("mason-lspconfig").setup({
