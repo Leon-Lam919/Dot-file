@@ -145,8 +145,11 @@ require("lazy").setup({
 	-- NOTE: Plugins can be added with a link (or for a github repo: 'owner/repo' link).
 	"tpope/vim-sleuth", -- Detect tabstop and shiftwidth automatically
 	-- Add coc.nvim plugin
-	"neoclide/coc.nvim",
-
+	{
+		"neoclide/coc.nvim",
+		branch = "release",
+		build = "yarn install --frozen-lockfile && yarn build",
+	},
 	-- NOTE: Plugins can also be added by using a table,
 	-- with the first argument being the link and the following
 	-- keys can be used to configure plugin behavior/loading/etc.
@@ -561,6 +564,21 @@ require("lazy").setup({
 				clangd = {},
 				gopls = {},
 				pyright = {},
+				html = {
+					settings = {
+						html = {
+							format = {
+								enable = true,
+								wrapLineLength = 120,
+								wrapAttributes = "auto",
+							},
+							hover = {
+								documentation = true,
+								references = true,
+							},
+						},
+					},
+				},
 				rust_analyzer = {},
 				jdtls = {
 					settings = {
@@ -694,6 +712,35 @@ require("lazy").setup({
 			-- Update Mason tool installer
 			require("mason-tool-installer").setup({
 				ensure_installed = ensure_installed,
+			})
+			vim.list_extend(ensure_installed, { "html" })
+
+			-- Configure HTML LSP in lspconfig
+			servers.html = {
+				settings = {
+					html = {
+						format = {
+							enable = true,
+							wrapLineLength = 120,
+							wrapAttributes = "auto",
+						},
+					},
+				},
+			}
+			local capabilities = vim.lsp.protocol.make_client_capabilities()
+			capabilities = vim.tbl_deep_extend("force", capabilities, require("cmp_nvim_lsp").default_capabilities())
+
+			require("lspconfig").html.setup({
+				capabilities = capabilities, -- Pass the extended capabilities here
+				settings = {
+					html = {
+						format = {
+							enable = true,
+							wrapLineLength = 120,
+							wrapAttributes = "auto",
+						},
+					},
+				},
 			})
 			-- Create a custom handler for JDTLS
 			require("mason-lspconfig").setup({
